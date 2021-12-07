@@ -1,0 +1,379 @@
+#getwd()
+#setwd("C:/Users/User/Documents/R")
+#source("InvestmentScience_Chapter2_functions.R")
+
+#########################
+#Examples
+#########################
+
+#2.1
+CF<-c(-2,1,1,1)
+r<-0.10
+
+FV_compound_interest(CF,r)
+
+#2.2
+PV_compound_interest(CF,r)
+
+#2.3
+
+irr<-IRR_Newton_Method(CF)
+
+#2.4
+
+CF24a<-c(-1,2)
+CF24b<-c(-1,0,3)
+
+PV_compound_interest(CF24a, r)
+PV_compound_interest(CF24b, r)
+
+#2.5
+
+irr25a<-IRR_Newton_Method(CF24a)
+irr25b<-IRR_Newton_Method(CF24b)
+
+#2.6
+
+CF26<-c(0, rep(2*10^6, 10))
+PV_compound_interest(CF26, r)
+
+#2.7
+
+CF27a<-c(20000, rep(1000,3))
+CF27b<-c(30000, rep(2000,5))
+
+#one way
+PV27a<-PV_compound_interest(CF27a, r)
+PV27b<-PV_compound_interest(CF27b, r)
+
+CF27aM<-rep(c(PV27a,rep(0,3)),3)
+CF27bM<-rep(c(PV27b,rep(0,5)),2)
+
+PV27aM<-PV_compound_interest(CF27aM, r)
+PV27bM<-PV_compound_interest(CF27bM, r)
+
+#another way
+CF27aM<-rep(CF27a,3)
+CF27bM<-rep(CF27b,2)
+
+PV27aM<-PV_compound_interest(CF27aM, r26)
+PV27bM<-PV_compound_interest(CF27bM, r26)
+
+#2.8
+
+#buiding cahflows examples
+CF28<- list()
+PV28<- c()
+for(i in 1:10){
+  CF28[[i]] <- c(10, seq(2, i+1))
+  PV28[i] <- PV_periodic_cashflow(CF28[[i]] , r)
+}
+
+which.min(PV28)
+
+#2.9
+#deprecission =====
+#example 2.9
+
+A<- 10000
+salvage<- 2000
+income<-c(0,rep(3000,4))
+t<-4
+depreciation<-c(0,rep((A-salvage)/t, 4))
+initial_income<-c(-A, income[-1])
+initial_income[length(initial_income)]<-tail(initial_income,1)+salvage
+
+tax_rate<-.43
+tax_income<-income-depreciation
+taxes<-tax_income*tax_rate
+
+final_income<-initial_income-taxes
+
+PV_compound_interest(initial_income, rate=.10)
+PV_compound_interest(final_income, rate=.10)
+
+#2.10
+CF10<-c(-10000, 5000, 5000, 5000, 3000)
+f<-0.04
+
+PV210<-PV_compound_interest(CF10, rate = r, inflation = f)
+
+
+
+
+#########################
+#Exercises
+#########################
+
+#1
+A1<-1 
+r1<-0.033
+t1<-1998-1776 #year of the book
+
+Income<-compound_interest_income(A1, r1, t1)
+#1349
+
+r1b<-2*r1
+Income_b<-compound_interest_income(A1, r1b, t1)
+#1452444
+
+#2 
+#demonstration
+
+
+#3
+r3a<-0.03
+t3<-1
+
+rate3a<-compound_interest_yield_factor(r3a,t3, "monthly")-1
+
+r3b<-0.18
+rate3b<-compound_interest_yield_factor(r3b,t3, "monthly")-1
+rate3c<-compound_interest_yield_factor(r3b,t3, "quarterly")-1
+
+#4 
+
+CF4<-c(-1, 1, 1)
+
+IRR_Newton_Method(CF4)
+
+#5
+10000000/20
+cash_flow_5<- rep(500000,20)
+r5<-0.1
+
+PV5<-PV_compound_interest(cash_flow_5,r)
+
+
+
+CF61[-1]*1:5
+
+#6 
+
+CF61<-rep(-1000, 6)
+CF62<-c(-1000,rep(-900, 5))
+
+CF6<-c(0, rep(100, 5))
+
+r6<- .12
+
+l<-length(CF61)
+pv<-c()
+
+for(i in 1:l){
+  pv[i]<-discount_factor(CF61[i], r6, (i-1)/12)
+}
+
+PV61<- sum(pv)
+
+for(i in 1:l){
+  pv[i]<-discount_factor(CF62[i], r6, (i-1)/12)
+}
+
+PV62<- sum(pv)
+
+
+for(i in 1:l){
+  pv[i]<-discount_factor(CF6[i], r6, (i-1)/12)
+}
+
+PV6<- sum(pv)
+PV61-PV62
+
+#==
+
+CF61b<-rep(-1000, 12)
+CF62b<-c(-1000,rep(-900, 11))
+
+CF6b<-c(0, rep(100, 11))
+
+r6<- .12
+
+l<-length(CF61b)
+pv<-c()
+
+for(i in 1:l){
+  pv[i]<-discount_factor(CF61b[i], r6, (i-1)/12)
+}
+
+PV61b<- sum(pv)
+
+for(i in 1:l){
+  pv[i]<-discount_factor(CF62b[i], r6, (i-1)/12)
+}
+
+PV62b<- sum(pv)
+
+for(i in 1:l){
+  pv[i]<-discount_factor(CF6b[i], r6, (i-1)/12)
+}
+
+PV6b<- sum(pv)
+PV61b-PV62b
+
+#7
+
+#example 2.4
+r<-0.1
+CF7a<-c(-1,2)
+CF7b<-c(-1,0,3)
+
+PV7a<-PV_compound_interest(CF7a,r)
+PV7b<-PV_compound_interest(CF7b,r)
+
+compound_interest_income(PV7b+1, r, 3)
+
+(PV7b+1)*(1+r)^3
+
+#8
+
+#9
+
+r9<-0.05
+
+CF9_old<-c(6948, rep(0,5))
+
+CF9_new<-c(20000, rep(0,20))
+
+PV9_new<-PV_periodic_cashflow(CF9_new, r9)
+
+sum(1/(1.05)^(seq(0, 20, 5)))
+
+cycle_cashflow(PV9_new, r9, length(CF9_old)-1)
+
+PV_total<-pv_cycle/(1 - (1/(1+real_rate)^(period-1)))
+
+#function
+
+
+
+
+#10
+
+Barrels<-c(80000, 70000, 50000, 30000, 10000)
+
+Option2<-Barrels*5
+
+GrossRevenue<-c(1600000, 1400000, 1000000, 600000, 200000)
+Netincome<-c(1200000, 1000000, 500000, 200000, 50000)
+
+Option1<-c()
+for(i in 1:length(GrossRevenue)){
+  Option1[i]<-min(GrossRevenue[i]*.22, Netincome[i]*.5)
+}
+
+Depletion<-c()
+for(i in 1:length(GrossRevenue)){
+  Depletion[i]<-max(Option1[i], Option2[i])
+}
+
+Tax_income<-Netincome-Depletion
+
+Taxes<-Tax_income*.45
+
+AT_income<-Netincome-Taxes
+
+#a
+
+Table2_7<-data.frame(Barrels, GrossRevenue, Netincome, Option1, Option2, Depletion, Tax_income, Taxes, AT_income)
+
+#b
+rate10<-.20
+AT_cash_flow<-c(-10^6, AT_income)
+PV10<-PV_compound_interest(AT_cash_flow, rate10)
+
+#IRR
+ifun10<-makeFun(-10^6 + 840000*x + 707500*x^2 +387500*x^3 + 177500*x^4 + 50000*x^5 ~ x)
+Newton_Method_moisac(ifun10)
+
+
+#11
+
+Project1<-c(-100, rep(30,5))
+Project2<-c(-150, rep(42,5))
+rate11<-0.05
+
+#irr
+
+irrp1<-IRR_Newton_Method(Project1)
+irrp2<-IRR_Newton_Method(Project2)
+#irrp1
+
+#PV
+PVp1<-PV_compound_interest(Project1,rate11)
+PVp2<-PV_compound_interest(Project2,rate11)
+#PVp2
+
+
+
+#12
+30/100
+42/150
+
+#13
+sum(Project1)
+sum(Project2)
+
+
+Project3<-Project2-Project1
+
+irr3<-IRR_Newton_Method(Project3)
+
+
+#14
+
+A14<-1
+Dep_rate1<-c(.25,.38,.37)
+Dep_rate2<-c(1/3,1/3,1/3)
+Dep1<-c()
+Dep2<-c()
+
+Dep1[1]<-1-Dep_rate1[1]
+Dep2[1]<-1-Dep_rate2[1]
+
+for(i in 2:3 ){
+  Dep1[i]<-Dep1[i-1]-Dep_rate1[i]
+  Dep2[i]<-Dep2[i-1]-Dep_rate2[i]
+  
+}
+
+PV14<-list()
+
+for(i in 1:20){
+  PV14[[i]]<-c(PV_compound_interest(Dep_rate1, i/10),
+               PV_compound_interest(Dep_rate2, i/10),
+               PV_compound_interest(Dep_rate1, i/10)-PV_compound_interest(Dep_rate2, i/10)
+               )
+}
+
+Dep_rate1-Dep_rate2
+IRR_Newton_Method(Dep_rate2-Dep_rate1)
+
+#15
+A15<-10000000
+GRevenue15<-c(rep(1000000*3.3,5))
+labor15<-c(rep(10000*30, 5))
+Raw_mat15<-c( rep(100*100,5))
+Deprec15<-c()
+
+for(i in 1:5){
+  Deprec15[i]<-A15*(1/5)
+}
+
+tax_income15<-GRevenue15-labor15-Raw_mat15-Deprec15
+taxes15<-tax_income15*.34
+
+Netincome15<-GRevenue15-labor15-Raw_mat15
+
+AT_income15<-Netincome15-taxes15
+
+cash_flow_15<-c(-A15,AT_income15 )
+rate15<-.12
+PV_compound_interest(cash_flow_15, rate15)
+
+f15<-.04
+
+PV_compound_interest(cash_flow_15, rate15, inflation = f15)
+#680731
+
+#89000
