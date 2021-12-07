@@ -1,6 +1,6 @@
 #getwd()
 #setwd("C:/Users/User/Documents/R")
-#source("InvestmentScience_Chapter2_functions.R")
+source("InvestmentScience_Chapter2_functions.R")
 
 #########################
 #Examples
