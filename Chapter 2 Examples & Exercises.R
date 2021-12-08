@@ -2,6 +2,12 @@
 #setwd("C:/Users/User/Documents/R")
 source("InvestmentScience_Chapter2_functions.R")
 
+
+simple_interest_income<-function( Investment, rate, time){
+  Mortage <- (1+rate*time)*Investment
+  return(Mortage)
+}
+
 #########################
 #Examples
 #########################
@@ -150,66 +156,57 @@ CF61[-1]*1:5
 
 #6 
 
+#6 months
 CF61<-rep(-1000, 6)
-CF62<-c(-1000,rep(-900, 5))
+CF62<-c(-1900,rep(-900, 5))
 
-CF6<-c(0, rep(100, 5))
+CF6<-CF62-CF61
 
 r6<- .12
 
 l<-length(CF61)
-pv<-c()
+
+pv61<-c()
+pv62<-c()
+pv6<-c()
 
 for(i in 1:l){
-  pv[i]<-discount_factor(CF61[i], r6, (i-1)/12)
+  pv61[i]<-compound_interest_price(CF61[i], r6, (i-1)/12)
+  pv62[i]<-compound_interest_price(CF62[i], r6, (i-1)/12)
+  pv6[i]<-compound_interest_price(CF6[i], r6, (i-1)/12)
 }
 
-PV61<- sum(pv)
-
-for(i in 1:l){
-  pv[i]<-discount_factor(CF62[i], r6, (i-1)/12)
-}
-
-PV62<- sum(pv)
-
-
-for(i in 1:l){
-  pv[i]<-discount_factor(CF6[i], r6, (i-1)/12)
-}
-
-PV6<- sum(pv)
+PV61<- sum(pv61)
+PV62<- sum(pv62)
+PV6<- sum(pv6)
 PV61-PV62
+#do not switch
 
-#==
+# 1 year
 
 CF61b<-rep(-1000, 12)
-CF62b<-c(-1000,rep(-900, 11))
-
-CF6b<-c(0, rep(100, 11))
+CF62b<-c(-1900,rep(-900, 11))
+CF6b<-CF62b-CF61b
 
 r6<- .12
 
 l<-length(CF61b)
-pv<-c()
+pv61b<-c()
+pv62b<-c()
+pv6b<-c()
 
 for(i in 1:l){
-  pv[i]<-discount_factor(CF61b[i], r6, (i-1)/12)
+  pv61b[i]<-compound_interest_price(CF61b[i], r6, (i-1)/12)
+  pv62b[i]<-compound_interest_price(CF62b[i], r6, (i-1)/12)
+  pv6b[i]<-compound_interest_price(CF6b[i], r6, (i-1)/12)
 }
 
-PV61b<- sum(pv)
-
-for(i in 1:l){
-  pv[i]<-discount_factor(CF62b[i], r6, (i-1)/12)
-}
-
-PV62b<- sum(pv)
-
-for(i in 1:l){
-  pv[i]<-discount_factor(CF6b[i], r6, (i-1)/12)
-}
-
-PV6b<- sum(pv)
+PV61b<- sum(pv61b)
+PV62b<- sum(pv62b)
+PV6b<- sum(pv6b)
 PV61b-PV62b
+
+#add other frequencies in PV function
 
 #7
 
@@ -226,6 +223,13 @@ compound_interest_income(PV7b+1, r, 3)
 (PV7b+1)*(1+r)^3
 
 #8
+
+CF8A<- -c(6000, rep(8000,4))
+CF8B<- -c(30000, rep(2000,4))
+CF8B[length(CF8B)]<-CF8B[length(CF8B)]+10000 #resale
+
+IRR_Newton_Method(CF8B-CF8A)
+#yes, it yields a return of 12.9%
 
 #9
 
@@ -283,9 +287,7 @@ AT_cash_flow<-c(-10^6, AT_income)
 PV10<-PV_compound_interest(AT_cash_flow, rate10)
 
 #IRR
-ifun10<-makeFun(-10^6 + 840000*x + 707500*x^2 +387500*x^3 + 177500*x^4 + 50000*x^5 ~ x)
-Newton_Method_moisac(ifun10)
-
+irr10<-IRR_Newton_Method(AT_cash_flow)
 
 #11
 
@@ -323,31 +325,20 @@ irr3<-IRR_Newton_Method(Project3)
 #14
 
 A14<-1
-Dep_rate1<-c(.25,.38,.37)
-Dep_rate2<-c(1/3,1/3,1/3)
-Dep1<-c()
-Dep2<-c()
-
-Dep1[1]<-1-Dep_rate1[1]
-Dep2[1]<-1-Dep_rate2[1]
-
-for(i in 2:3 ){
-  Dep1[i]<-Dep1[i-1]-Dep_rate1[i]
-  Dep2[i]<-Dep2[i-1]-Dep_rate2[i]
-  
-}
+Dep_rate1<-c(-1,.25,.38,.37)
+Dep_rate2<-c(-1,1/3,1/3,1/3)
 
 PV14<-list()
 
-for(i in 1:20){
-  PV14[[i]]<-c(PV_compound_interest(Dep_rate1, i/10),
-               PV_compound_interest(Dep_rate2, i/10),
-               PV_compound_interest(Dep_rate1, i/10)-PV_compound_interest(Dep_rate2, i/10)
+for(i in 1:50){
+  PV14[[i]]<-c(PV_compound_interest(Dep_rate1, i/100),
+               PV_compound_interest(Dep_rate2, i/100),
+               PV_compound_interest(Dep_rate1-Dep_rate2, i/100)
                )
 }
 
-Dep_rate1-Dep_rate2
-IRR_Newton_Method(Dep_rate2-Dep_rate1)
+
+IRR_Newton_Method(Dep_rate1-Dep_rate2)
 
 #15
 A15<-10000000
@@ -377,3 +368,7 @@ PV_compound_interest(cash_flow_15, rate15, inflation = f15)
 #680731
 
 #89000
+
+
+
+
