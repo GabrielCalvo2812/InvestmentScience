@@ -2,12 +2,6 @@
 #setwd("C:/Users/User/Documents/R")
 source("InvestmentScience_Chapter2_functions.R")
 
-
-simple_interest_income<-function( Investment, rate, time){
-  Mortage <- (1+rate*time)*Investment
-  return(Mortage)
-}
-
 #########################
 #Examples
 #########################
@@ -205,8 +199,9 @@ PV61b<- sum(pv61b)
 PV62b<- sum(pv62b)
 PV6b<- sum(pv6b)
 PV61b-PV62b
+#switch
 
-#add other frequencies in PV function
+#PS:add other frequencies in PV function
 
 #7
 
@@ -368,7 +363,5 @@ PV_compound_interest(cash_flow_15, rate15, inflation = f15)
 #680731
 
 #89000
-
-
 
 
