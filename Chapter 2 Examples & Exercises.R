@@ -1,5 +1,5 @@
-#getwd()
-#setwd("C:/Users/User/Documents/R")
+getwd()
+setwd("C:/Users/User/Documents/R")
 source("InvestmentScience_Chapter2_functions.R")
 
 #########################
@@ -56,8 +56,8 @@ PV27bM<-PV_compound_interest(CF27bM, r)
 CF27aM<-rep(CF27a,3)
 CF27bM<-rep(CF27b,2)
 
-PV27aM<-PV_compound_interest(CF27aM, r26)
-PV27bM<-PV_compound_interest(CF27bM, r26)
+PV27aM<-PV_compound_interest(CF27aM, r)
+PV27bM<-PV_compound_interest(CF27bM, r)
 
 #2.8
 
@@ -123,19 +123,17 @@ Income_b<-compound_interest_income(A1, r1b, t1)
 
 #3
 r3a<-0.03
-t3<-1
-
-rate3a<-compound_interest_yield_factor(r3a,t3, "monthly")-1
+rate3a<-effective_rate(r3a, "monthly")#3.04%
 
 r3b<-0.18
-rate3b<-compound_interest_yield_factor(r3b,t3, "monthly")-1
-rate3c<-compound_interest_yield_factor(r3b,t3, "quarterly")-1
+rate3b<-effective_rate(r3b, interval = "monthly") #19.56%
+rate3c<-effective_rate(r3b, "quarterly") #19.25%
 
 #4 
 
 CF4<-c(-1, 1, 1)
 
-IRR_Newton_Method(CF4)
+irr4<-IRR_Newton_Method(CF4) #61.8%
 
 #5
 10000000/20
@@ -143,7 +141,7 @@ cash_flow_5<- rep(500000,20)
 r5<-0.1
 
 PV5<-PV_compound_interest(cash_flow_5,r)
-
+#4.68 million
 
 
 CF61[-1]*1:5
@@ -158,50 +156,17 @@ CF6<-CF62-CF61
 
 r6<- .12
 
-l<-length(CF61)
+#6 months
+PV6new<-PV_compound_interest(CF6, r6, freq="monthly") #-413
+PV61new<-PV_compound_interest(CF61, r6, freq="monthly")
+PV62new<-PV_compound_interest(CF62, r6, freq="monthly")
 
-pv61<-c()
-pv62<-c()
-pv6<-c()
+#1 year
+PV6bnew<-PV_compound_interest(CF6b, r6, freq="monthly") #139
+PV61bnew<-PV_compound_interest(CF61b, r6, freq="monthly")
+PV62bnew<-PV_compound_interest(CF62b, r6, freq="monthly")
 
-for(i in 1:l){
-  pv61[i]<-compound_interest_price(CF61[i], r6, (i-1)/12)
-  pv62[i]<-compound_interest_price(CF62[i], r6, (i-1)/12)
-  pv6[i]<-compound_interest_price(CF6[i], r6, (i-1)/12)
-}
-
-PV61<- sum(pv61)
-PV62<- sum(pv62)
-PV6<- sum(pv6)
-PV61-PV62
-#do not switch
-
-# 1 year
-
-CF61b<-rep(-1000, 12)
-CF62b<-c(-1900,rep(-900, 11))
-CF6b<-CF62b-CF61b
-
-r6<- .12
-
-l<-length(CF61b)
-pv61b<-c()
-pv62b<-c()
-pv6b<-c()
-
-for(i in 1:l){
-  pv61b[i]<-compound_interest_price(CF61b[i], r6, (i-1)/12)
-  pv62b[i]<-compound_interest_price(CF62b[i], r6, (i-1)/12)
-  pv6b[i]<-compound_interest_price(CF6b[i], r6, (i-1)/12)
-}
-
-PV61b<- sum(pv61b)
-PV62b<- sum(pv62b)
-PV6b<- sum(pv6b)
-PV61b-PV62b
-#switch
-
-#PS:add other frequencies in PV function
+#add other frequencies in PV function
 
 #7
 
@@ -213,9 +178,8 @@ CF7b<-c(-1,0,3)
 PV7a<-PV_compound_interest(CF7a,r)
 PV7b<-PV_compound_interest(CF7b,r)
 
-compound_interest_income(PV7b+1, r, 3)
+compound_interest_income(PV7b+1, r, 3) #3.3
 
-(PV7b+1)*(1+r)^3
 
 #8
 
@@ -230,22 +194,12 @@ IRR_Newton_Method(CF8B-CF8A)
 
 r9<-0.05
 
-CF9_old<-c(6948, rep(0,5))
-
 CF9_new<-c(20000, rep(0,20))
 
 PV9_new<-PV_periodic_cashflow(CF9_new, r9)
 
-sum(1/(1.05)^(seq(0, 20, 5)))
-
-cycle_cashflow(PV9_new, r9, length(CF9_old)-1)
-
-PV_total<-pv_cycle/(1 - (1/(1+real_rate)^(period-1)))
-
-#function
-
-
-
+Price_old<-cycle_cashflow(PV9_new, r9, length(CF9_old)-1)
+#6948
 
 #10
 
@@ -280,9 +234,11 @@ Table2_7<-data.frame(Barrels, GrossRevenue, Netincome, Option1, Option2, Depleti
 rate10<-.20
 AT_cash_flow<-c(-10^6, AT_income)
 PV10<-PV_compound_interest(AT_cash_flow, rate10)
+#5.21 million
 
 #IRR
 irr10<-IRR_Newton_Method(AT_cash_flow)
+#52.1 %
 
 #11
 
@@ -292,13 +248,13 @@ rate11<-0.05
 
 #irr
 
-irrp1<-IRR_Newton_Method(Project1)
-irrp2<-IRR_Newton_Method(Project2)
+irrp1<-IRR_Newton_Method(Project1) #15.23
+irrp2<-IRR_Newton_Method(Project2) #12.37
 #irrp1
 
 #PV
-PVp1<-PV_compound_interest(Project1,rate11)
-PVp2<-PV_compound_interest(Project2,rate11)
+PVp1<-PV_compound_interest(Project1,rate11) #29.884
+PVp2<-PV_compound_interest(Project2,rate11) #31.838
 #PVp2
 
 
@@ -315,7 +271,7 @@ sum(Project2)
 Project3<-Project2-Project1
 
 irr3<-IRR_Newton_Method(Project3)
-
+#6.4%
 
 #14
 
@@ -359,9 +315,9 @@ PV_compound_interest(cash_flow_15, rate15)
 
 f15<-.04
 
-PV_compound_interest(cash_flow_15, rate15, inflation = f15)
+PV15<-PV_compound_interest(cash_flow_15, rate15, inflation = f15)
 #680731
 
-#89000
+#89000 (?)
 
 
