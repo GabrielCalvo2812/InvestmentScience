@@ -1,12 +1,6 @@
 #annual yields standard
   #adapt to any frequency (daily, weekly, monthly, quarterly)
 
-#inflation 
-inflation_rate<-function(nominal, inflation){
-  real_rate<-(nominal - inflation)/(1+inflation)
-  return(real_rate)
-}
-
 #simple interest rate ==============================
 #simple interest yield
 simple_interest_yield_factor<- function(rate, time){
@@ -36,49 +30,62 @@ simple_interest_price<-function( Investment, rate, time){
   return(Price)
 }
 
-#pv
 
 #compound interest ==================================
-#yield factor
-compound_interest_yield_factor<-function(rate, time, interval){
-  
-  m<-c()
-  
-  #compound condition: annual, quarterly, etc. for effective rate
-  
-  if(interval == "annually"){m<-1}
-  if(interval == "semi-annually"){m<-2}
-  if(interval == "quarterly"){m<-4}
-  if(interval == "monthly"){m<-12}
-  
-  yield<-(1+rate/m)^(time*m)
 
+#effective rate
+effective_rate<-function(nominal, interval = "annually"){
+  
   if(interval == "continuous"){
-    yield <- exp(time*rate)
-    return(yield)
+    r_ef <- exp(nominal)-1
+    return(r_ef)
   }
   
+  m_df<-data.frame(interval=c("annually","semi-annually", "quarterly", "monthly"),
+                   m=c(1,2,4,12))
+  m<-m_df$m[m_df$interval==interval]
+  r_ef<-(1+nominal/m)^(m)-1
+  
+  return(r_ef)
+}
+
+#inflation 
+real_rate<-function(nominal, inflation = 0){
+  real_rate<-(nominal - inflation)/(1+inflation)
+  return(real_rate)
+}
+
+#yield factor
+compound_interest_yield_factor<-function(rate, time, interval = "annually", inflation = 0){
+  
+  rate_ef<-effective_rate(rate, interval)
+  rate_real<-real_rate(rate_ef, inflation)
+  
+  yield<-(1+rate)^(time)
   return(yield)
 }
 
 #compound interest income
-compound_interest_income<-function( Investment, rate, time, interval = "annually" ){
-
-  yield<-compound_interest_yield_factor(rate, time, interval)
+compound_interest_income<-function( Investment, rate, time, interval = "annually", inflation = 0){
+  
+  yield<-compound_interest_yield_factor(rate, time, interval, inflation)
   Income<- yield*Investment
   return(Income)
-
 }
 
 #Future Value
-FV_compound_interest <- function(investment, rate, interval = "annually", inflation = 0){
+FV_compound_interest <- function(investment, rate, interval = "annually", inflation = 0, freq = "annually"){
   
-  real_rate<-inflation_rate(rate, inflation)
   time_window<-length(investment)
   future_values<-c()
   
+  k_df<-data.frame(freq=c("annually","semi-annually", "quarterly", "monthly"),
+                     k=c(1,2,4,12))
+  k<-k_df$k[k_df$freq==freq]
+  
   for(i in 1:time_window){
-    future_values[i]<-compound_interest_income(investment[i], real_rate, time_window-i, interval)
+    t_k<-(time_window-i)/k
+    future_values[i]<-compound_interest_income(investment[i], rate, t_k, interval, inflation )
   }
   
   Future_Value<-sum(future_values)
@@ -89,42 +96,37 @@ FV_compound_interest <- function(investment, rate, interval = "annually", inflat
 
 
 #Discount factor
-compound_interest_discount_factor<- function( rate, time, interval = "annually"){
+compound_interest_discount_factor<- function( rate, time, interval = "annually", inflation = 0){
   
-  #m<-c()
+  rate_ef<-effective_rate(rate, interval)
+  rate_real<-real_rate(rate_ef, inflation)
   
-  if(interval == "annually"){m<-1}
-  if(interval == "semi-annually"){m<-2}
-  if(interval == "quarterly"){m<-4}
-  if(interval == "monthly"){m<-12}
-  
-  discount<-1/((1+rate/m)^(time*m))
-  
-  if(interval == "continuous"){
-    discount<-1/(exp(time*rate))
-    return(discount)
-  }
+  discount<-1/((1+rate_real)^(time))
   
   return(discount)
   
 }
 
 #present price
-compound_interest_price<-function(Investment, rate, time, interval = "annually" ){
-  discount<-compound_interest_discount_factor(rate, time, interval)
+compound_interest_price<-function(Investment, rate, time, interval = "annually" , inflation = 0){
+  discount<-compound_interest_discount_factor(rate, time, interval, inflation )
   Price<-discount*Investment
   return(Price)
 }
 
 #Present Value
-PV_compound_interest <- function(cashflow, rate, interval = "annually", inflation = 0){
+PV_compound_interest <- function(cashflow, rate, interval = "annually", inflation = 0, freq = "annually"){
   
-  real_rate<-inflation_rate(rate, inflation)
   time_window<-length(cashflow)
   present_values<-c()
+
+  k_df<-data.frame(freq=c("annually","semi-annually", "quarterly", "monthly"),
+                   k=c(1,2,4,12))
+  k<-k_df$k[k_df$freq==freq]
   
   for(i in 1:time_window){
-    present_values[i]<-compound_interest_price(cashflow[i], real_rate, i-1, interval)
+    t_k<-(i-1)/k
+    present_values[i]<-compound_interest_price(cashflow[i], rate, t_k, interval, inflation)
   }
   
   Present_Value<-sum(present_values)
@@ -134,10 +136,12 @@ PV_compound_interest <- function(cashflow, rate, interval = "annually", inflatio
 }
 
 #Periodic Cash Flow
-PV_periodic_cashflow<-function(cashflow, rate, interval, inflation = 0){
+PV_periodic_cashflow<-function(cashflow, rate, interval = "annually", inflation = 0, freq = "annually"){
   
+  rate_ef<-effective_rate(rate, freq)
   real_rate<-inflation_rate(rate, inflation)
-  pv_cycle<-PV_compound_interest(cashflow, real_rate, interval)
+  
+  pv_cycle<-PV_compound_interest(cashflow, rate, interval, inflation, freq)
   
   period<-length(cashflow)
   
@@ -179,4 +183,3 @@ IRR_Newton_Method<-function(cash_flow){
   
   return(irrNM)
 }
-
