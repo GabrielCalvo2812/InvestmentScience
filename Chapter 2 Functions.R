@@ -55,13 +55,18 @@ real_rate<-function(nominal, inflation = 0){
   return(real_rate)
 }
 
+rate_adjust<-function(rate, interval = "annually", inflation = 0){
+  rate_ef<-effective_rate(rate, interval)
+  rate_real<-real_rate(rate_ef, inflation)
+  return(rate_real)
+}
+
 #yield factor
 compound_interest_yield_factor<-function(rate, time, interval = "annually", inflation = 0){
   
-  rate_ef<-effective_rate(rate, interval)
-  rate_real<-real_rate(rate_ef, inflation)
+  rate_ad<-rate_adjust(rate, interval, inflation)
   
-  yield<-(1+rate)^(time)
+  yield<-(1+rate_ad)^(time)
   return(yield)
 }
 
@@ -98,10 +103,9 @@ FV_compound_interest <- function(investment, rate, interval = "annually", inflat
 #Discount factor
 compound_interest_discount_factor<- function( rate, time, interval = "annually", inflation = 0){
   
-  rate_ef<-effective_rate(rate, interval)
-  rate_real<-real_rate(rate_ef, inflation)
+  rate_ad<-rate_adjust(rate, interval, inflation)
   
-  discount<-1/((1+rate_real)^(time))
+  discount<-1/((1+rate_ad)^(time))
   
   return(discount)
   
@@ -138,16 +142,15 @@ PV_compound_interest <- function(cashflow, rate, interval = "annually", inflatio
 #Periodic Cash Flow
 PV_periodic_cashflow<-function(cashflow, rate, interval = "annually", inflation = 0, freq = "annually"){
   
-  rate_ef<-effective_rate(rate, freq)
-  real_rate<-inflation_rate(rate, inflation)
-  
+  rate_ad<- rate_adjust(rate, interval, inflation)
+
   pv_cycle<-PV_compound_interest(cashflow, rate, interval, inflation, freq)
   
   period<-length(cashflow)
   
   #implement interval
   #vary start point
-  PV_total<-pv_cycle/(1 - (1/(1+real_rate)^(period-1)))
+  PV_total<-pv_cycle/(1 - (1/(1+rate_ad)^(period-1)))
   
   #return(list(pv_cycle, PV_total,l))
   return(PV_total)
@@ -183,3 +186,4 @@ IRR_Newton_Method<-function(cash_flow){
   
   return(irrNM)
 }
+
