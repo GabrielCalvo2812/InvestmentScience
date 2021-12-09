@@ -1,7 +1,7 @@
 getwd()
 setwd("C:/Users/User/Documents/R")
 source("InvestmentScience_Chapter2_functions.R")
-
+rm(list=ls())
 #########################
 #Examples
 #########################
@@ -10,32 +10,33 @@ source("InvestmentScience_Chapter2_functions.R")
 CF<-c(-2,1,1,1)
 r<-0.10
 
-FV_compound_interest(CF,r)
+FV_compound_interest(CF,r) #.648
 
 #2.2
-PV_compound_interest(CF,r)
+PV_compound_interest(CF,r) #.487
 
 #2.3
 
-irr<-IRR_Newton_Method(CF)
+irr<-IRR_Newton_Method(CF) #23.37%
 
 #2.4
 
 CF24a<-c(-1,2)
 CF24b<-c(-1,0,3)
 
-PV_compound_interest(CF24a, r)
-PV_compound_interest(CF24b, r)
+PV_compound_interest(CF24a, r) #.818
+PV_compound_interest(CF24b, r) #1.479
 
 #2.5
 
-irr25a<-IRR_Newton_Method(CF24a)
-irr25b<-IRR_Newton_Method(CF24b)
+irr25a<-IRR_Newton_Method(CF24a) #100%
+irr25b<-IRR_Newton_Method(CF24b) #73.2%
 
 #2.6
 
 CF26<-c(0, rep(2*10^6, 10))
 PV_compound_interest(CF26, r)
+#12.28 million
 
 #2.7
 
@@ -43,21 +44,21 @@ CF27a<-c(20000, rep(1000,3))
 CF27b<-c(30000, rep(2000,5))
 
 #one way
-PV27a<-PV_compound_interest(CF27a, r)
-PV27b<-PV_compound_interest(CF27b, r)
+PV27a<-PV_compound_interest(CF27a, r) #22.4k
+PV27b<-PV_compound_interest(CF27b, r) #37.6k
 
 CF27aM<-rep(c(PV27a,rep(0,3)),3)
 CF27bM<-rep(c(PV27b,rep(0,5)),2)
 
-PV27aM<-PV_compound_interest(CF27aM, r)
-PV27bM<-PV_compound_interest(CF27bM, r)
+PV27aM<-PV_compound_interest(CF27aM, r) #48k
+PV27bM<-PV_compound_interest(CF27bM, r) #58k
 
 #another way
 CF27aM<-rep(CF27a,3)
 CF27bM<-rep(CF27b,2)
 
-PV27aM<-PV_compound_interest(CF27aM, r)
-PV27bM<-PV_compound_interest(CF27bM, r)
+PV27aM<-PV_compound_interest(CF27aM, r) #48k
+PV27bM<-PV_compound_interest(CF27bM, r) #58k
 
 #2.8
 
@@ -69,7 +70,7 @@ for(i in 1:10){
   PV28[i] <- PV_periodic_cashflow(CF28[[i]] , r)
 }
 
-which.min(PV28)
+which.min(PV28) #5, 64.5
 
 #2.9
 #deprecission =====
@@ -89,15 +90,15 @@ taxes<-tax_income*tax_rate
 
 final_income<-initial_income-taxes
 
-PV_compound_interest(initial_income, rate=.10)
-PV_compound_interest(final_income, rate=.10)
+PV_compound_interest(initial_income, rate=.10) #875
+PV_compound_interest(final_income, rate=.10) #-487
 
 #2.10
 CF10<-c(-10000, 5000, 5000, 5000, 3000)
 f<-0.04
 
 PV210<-PV_compound_interest(CF10, rate = r, inflation = f)
-
+#5819
 
 
 
@@ -144,8 +145,6 @@ PV5<-PV_compound_interest(cash_flow_5,r)
 #4.68 million
 
 
-CF61[-1]*1:5
-
 #6 
 
 #6 months
@@ -156,12 +155,17 @@ CF6<-CF62-CF61
 
 r6<- .12
 
-#6 months
 PV6new<-PV_compound_interest(CF6, r6, freq="monthly") #-413
 PV61new<-PV_compound_interest(CF61, r6, freq="monthly")
 PV62new<-PV_compound_interest(CF62, r6, freq="monthly")
 
 #1 year
+
+CF61b<-rep(-1000, 12)
+CF62b<-c(-1900,rep(-900, 11))
+
+CF6b<-CF62b-CF61b
+
 PV6bnew<-PV_compound_interest(CF6b, r6, freq="monthly") #139
 PV61bnew<-PV_compound_interest(CF61b, r6, freq="monthly")
 PV62bnew<-PV_compound_interest(CF62b, r6, freq="monthly")
@@ -194,11 +198,12 @@ IRR_Newton_Method(CF8B-CF8A)
 
 r9<-0.05
 
+t9_old<-5
 CF9_new<-c(20000, rep(0,20))
 
-PV9_new<-PV_periodic_cashflow(CF9_new, r9)
+PV9_new<-PV_periodic_cashflow(CF9_new, r9) #32097
 
-Price_old<-cycle_cashflow(PV9_new, r9, length(CF9_old)-1)
+Price_old<-cycle_cashflow(PV9_new, r9, t9_old)
 #6948
 
 #10
@@ -288,8 +293,8 @@ for(i in 1:50){
                )
 }
 
-
 IRR_Newton_Method(Dep_rate1-Dep_rate2)
+
 
 #15
 A15<-10000000
@@ -312,6 +317,7 @@ AT_income15<-Netincome15-taxes15
 cash_flow_15<-c(-A15,AT_income15 )
 rate15<-.12
 PV_compound_interest(cash_flow_15, rate15)
+#-435k
 
 f15<-.04
 
@@ -319,5 +325,4 @@ PV15<-PV_compound_interest(cash_flow_15, rate15, inflation = f15)
 #680731
 
 #89000 (?)
-
 
